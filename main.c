@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DESCUENTO_AFI 0.95
+#define IVA 1.12
 /*
 Funcion para imprimir el menú principal
 */
@@ -14,7 +16,7 @@ void printMenu()
 	printf("1. Ingresar producto al carrito de compras\n");
 	printf("2. Eliminar producto del carrito de compras\n");
 	printf("3. Calcular total y aplicar descuento por afiliacion\n");
-	printf("4. Ingresar forma de pago & finalizar la compra actual\n");
+	printf("4. Efectuar pago & finalizar la compra actual\n");
 	printf("5. Cerrar programa\n");
 	
 
@@ -26,29 +28,11 @@ Funcion para ingresar un producto al carrito,
 toma dos punteros de arreglos para guardar la cantidad y el precio
 retorna la cantidad total de artículos.
 */
-int ingresarProductoCarrito(int * cantidad, double * precio)
+void ingresarProductoCarrito(int * cantidad, double * precio, int size)
 {
 
-	
-	int cantidad_productos=0;
-	
-	printf("Ingrese el numero de productos de la compra: ");
-	scanf ("%d", &cantidad_productos);
-	if (cantidad_productos < 1)
-	{
-		do{
-		
-			printf("Cantidad no válida\n");
-			scanf ("%d", &cantidad_productos);
 
-		}while (cantidad_productos < 1);
-	} 	
-	
-
-	cantidad = (int*)calloc(cantidad_productos, sizeof(int));
-	precio = (double*)calloc(cantidad_productos, sizeof(double));
-
-	for (int i=0; i<cantidad_productos; i++)
+	for (int i=0; i<size; i++)
 	{
 		int index = i+1;
 		int ctd = 0;
@@ -57,8 +41,10 @@ int ingresarProductoCarrito(int * cantidad, double * precio)
 		printf("Producto Nº %d \n",index);
 		printf("Cantidad: \n");
 		scanf ("%d", &ctd);
+		fflush( stdin );
 		printf("Precio: \n");
 		scanf ("%lf", &pr);
+		fflush( stdin );
 		
 		cantidad[i]=ctd;
 		precio[i] = pr;
@@ -66,18 +52,70 @@ int ingresarProductoCarrito(int * cantidad, double * precio)
 	}	
 
 	printf("Productos ingresados exitosamente. \n")	;	
-	
 
-	return cantidad_productos;
 }
 
 
 
 /*
 Funcion para eliminar productos de un carrito mediante su índice
+usa los punteros para encontrar el índice que se ingresó, 
+cambia la cantidad y el precio del producto a 0. Retorna el nuevo tamaño 
+del arreglo.
 */
-void eliminarProductoCarrito(int index)
+int eliminarProductoCarrito(int size, int * cantidad, double * precio)
 {
+	int out_of_size = size + 1;
+	
+	int index = 0;
+
+	printf ("Ingrese el numero del producto que desea eliminar del carrito \n");
+	printf("Recuerde que tiene %d productos en su lista \n", size);
+
+	scanf ("%d", &index);
+	fflush( stdin );
+
+	if (index < 1 || index > out_of_size)
+	{
+		do{
+		
+			printf("Índice no válido\n Ingrese un numero mayor (o igual) que 1 y menor (o igual a) %d\n", size);
+			scanf ("%d", &index);
+			fflush( stdin );
+
+		}while (index < 1 || index > out_of_size);
+	} 
+
+
+	if ( index < out_of_size){
+
+		for (int c = index - 1; c < size - 1; c++)
+		{
+			cantidad[c] = cantidad[c+1];
+			precio[c] = precio [c+1];
+		}
+		printf("Producto Nº %d ha sido eliminado satisfactoriamente\n",index);
+
+		printf("Detalle del carrito actual: \n");
+		for (int d= 0; d< size - 1; d++)
+		{
+			printf("Producto Nº %d	|",d+1);
+			printf("Cantidad: %d, Precio: %lf\n",cantidad[d], precio[d]);
+
+		}
+
+		
+		printf("Total de productos: %d\n", size-1);
+
+		return size - 1;	
+			
+	}
+
+	else {
+
+		printf("No se ha ejecutado acción alguna.\n");
+		return size;
+	}
 
 
 }
@@ -85,40 +123,75 @@ void eliminarProductoCarrito(int index)
 /*
 Funcion para calcular el total y aplicar descuento por afiliacion
 
-	Toma el puntero de los precios y calcula el total, con iva
+	Toma el puntero de los precios y calcula el total, con IVA
 Si es afiliado:
-	* Toma el total y le resta el 5%
+	* Toma el total y le resta el DESCUENTO_AFI (descuento de afiliado)
 	* Retorna el total
 Si no es afiliado:
 	* Retorna el total
 	
 */
-double calcularTotal(int * precio)
+double calcularTotal(int * cantidad,double * precio, int size)
 {
+	char afi;
+	double total = 0.0;
+	
+	printf ("¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n");
+	scanf (" %c", &afi);
+	printf(">>Usted ha presionado %c\n",afi);
+	printf("-------------Detalle de la compra--------------\n");
+	
+	for(int i=0; i<size; i++)
+	{
+		double precio_final = precio[i]*cantidad[i]*IVA;
+		total+=precio_final;
+		printf("Producto Nº %d	|Cantidad: %d 	|Precio: $%lf 	|Precio Final: $%lf\n", i+1,cantidad[i],precio[i], precio_final);
+	}
 
-	return 0.0;
+	printf("Total: $%lf\n", total);
+
+
+	if (afi =='1') 
+	{
+		double afi_total = total*DESCUENTO_AFI;
+		printf ("Total con descuento: $%lf\n", afi_total );
+		printf ("Usted ahorró %lf en esta compra por ser afiliado\n", total- afi_total);
+		return (afi_total);
+
+	}
+
+	else return total;
+	
 }
+
+
+
 
 /*
 Funcion para ingresar la forma de pago & finalizar la compra
 
-Si es en efectivo:
+En efectivo:
 	* pide el ingreso de la cantidad con la que pago el cliente
+	*valida que la cantidad sea mayor al total
 	* calcula el cambio
-		>si el cambio es negativo:
-			* le pide al cajero que vuelva a ingresar la cantidad
-			con la que pago el cliente 
-Si es con tarjeta:
-	* pide el ingreso del numero de tarjeta
 
-Pregunta al cajero si desea realizar mas compras
-	Retorna 1, si el cajero responde si
-	Retorna 0, si el cajero responde no
 */
 
 int finalizarCompra(double total)
 {
-	return 0;
+	double fp;	
+	printf("Ingrese la cantidad a pagar en efectivo:\n");
+	scanf (" %lf", &fp);
+	if (fp<total){
+		printf("La cantidad ingresada es insuficiente para realizar la compra\n");
+		return 0;
+	}
+	else {	
+	
+		printf ("Su cambio es de $%lf\n", fp-total);
+		return 1; 
+	}
+	
 
 }
 
@@ -131,95 +204,87 @@ int main(void)
 	char opt = 'a';
 	int * cantidades_productos;
 	double * precios_productos;
+	
+	double total_precio = 0.0;
+	int total_productos = 0;
+	
+	
 	do{
 		printMenu();
-		scanf ("%c", &opt);
-
+		scanf (" %c", &opt);
 	    	switch(opt){
 
 			case '1':
 				
 				printf(">>>>>>>>> INGRESO DE PRODUCTOS <<<<<<<<<\n");
-				ingresarProductoCarrito(cantidades_productos, precios_productos);
+				
+				printf("Ingrese el numero de productos de la compra: ");
 
+				scanf ("%d", &total_productos);
+				fflush( stdin );
+
+				if (total_productos < 1)
+				{
+					do{
+						
+						printf("Cantidad no válida\n");
+						scanf ("%d", &total_productos);
+						fflush( stdin );
+
+					}while (total_productos < 1);
+				} 
+	
+				cantidades_productos = (int*)calloc(total_productos, sizeof(int));
+				precios_productos = (double*)calloc(total_productos, sizeof(double));
+				
+				ingresarProductoCarrito(cantidades_productos, precios_productos, total_productos);
+				fflush( stdin );
 				break;
+
+
 			case '2':
 				
 				
 				printf(">>>>>>>>> ELIMINACION DE PRODUCTOS<<<<<<<<<\n");
-
+				total_productos = eliminarProductoCarrito(total_productos, cantidades_productos, precios_productos);
+				fflush( stdin );
+				
 				break;
 
 			case '3':
 
 				printf(">>>>>>>>> CALCULAR TOTAL <<<<<<<<<\n");
-			
+				total_precio=calcularTotal(cantidades_productos, precios_productos,total_productos);
 				break;
 
 			case '4':
 
 				printf(">>>>>>>>> EFECTUAR PAGO <<<<<<<<<\n");
+				if (finalizarCompra(total_precio)==1){
+					free (cantidades_productos);
+					free (precios_productos);
+				}
 
+				
 				break;
 
 			case '5':
 				printf("¡Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n");
-				free (cantidades_productos);
-				free (precios_productos);
 				
 				break;
 
 			default:
-
+				
 				printf("Opción no válida, ingrese un número entre el 1 y el 5 \n");
-				scanf ("%c", &opt);
+				scanf (" %c", &opt);
+				
+				
 
 			    break;
     }
 
     }while(opt !='5');
 
-
-
-
-/**
-    char c[10] = {0};
-    fgets(c,10,stdin);
-    int cantidad = 0;
-    sscanf(c, "%d", &cantidad);
-    //printf("%d\n",cantidad);
-
-    if(cantidad == 0){
-        printf("No hay artículos en el inventario");
-        exit(0);
-    }
-
-    float inventario[cantidad];
-    memset(inventario, 0, cantidad*sizeof(int));
-
-    printf("\n");
-    for(int i = 0; i < cantidad; i++){
-        printf("Precio del artículo N° %d: ", i+1);
-        float valor;
-        scanf("%f",&valor);
-        valor = valor * 1.12;
-        inventario[i] += valor;
-    }
-
-    printf("\n");
-    printf("Valores Finales (+IVA del %%12):\n");
-    for(int a = 0; a < cantidad; a++){
-        printf("-> $%.2f\n",inventario[a]);
-    }
-    printf("\n");
-
-    float total = 0;
-    for(int x = 0; x < cantidad; x++){
-        total += inventario[x];
-    }
-    printf("TOTAL: $%.2f\n",total);
-
-**/
     return 0;
 }
 
