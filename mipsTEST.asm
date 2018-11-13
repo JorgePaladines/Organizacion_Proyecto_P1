@@ -174,8 +174,10 @@ ingresarProductoCarrito:
 	
 	#Obtener los arreglos para usarlos dentro de la función
 	la $s1, 0($a0) #cantidad
-	l.s $f4, ($a1) #precio
+	la $s2, 0($a1) #precio
 	la $s3, 0($a2) #size
+	
+	
 	
 	
 	li $t2, 0 #int i = 0
@@ -205,8 +207,9 @@ ingresarProductoCarrito:
 		li $v0, 4
 		la $a0, str5 #"Precio: "
 		syscall
-		li $v0, 7
+		li $v0, 6
 		syscall
+		#add.s $f4, $v0, $f19
 		
 		#guardar en los arreglos
 		sll $t4, $t2, 2
@@ -215,7 +218,7 @@ ingresarProductoCarrito:
 		
 		sll $t4, $t2, 2
 		add $t4, $t4, $s2 #precio[i]
-		s.s $f4, 0($t4) #precio[i] = pr
+		s.s $f0, 0($t4) #precio[i] = pr
 		
 		addi $t2, $t2, 1 #i++
 		
@@ -476,8 +479,7 @@ calcularTotal:
 		la $a0, str8cal #"Total: $"
 		syscall
 		li $v0, 3
-		add.s $f10, $f7, $f19
-		add.d $f12, $f10, $f16
+		add.s $f12, $f7, $f19
 		syscall #printf("Total: $%lf\n", total);
 		li $v0, 4
 		la $a0, espacio
@@ -492,8 +494,7 @@ calcularTotal:
 		la $a0, str9cal #"Total con descuento: $"
 		syscall
 		li $v0, 3
-		add.s $f10, $f8, $f19
-		add.d $f12, $f10, $f16
+		add.s $f12, $f8, $f19
 		syscall
 		li $v0, 4
 		la $a0, espacio
@@ -502,8 +503,7 @@ calcularTotal:
 		syscall
 		
 		li $v0, 3
-		sub.s $f10, $f7, $f8 #total - afi_total
-		add.d $f12, $f10, $f16
+		sub.s $f12, $f7, $f8 #total - afi_total
 		syscall
 		li $v0, 4
 		la $a0, str11cal #" en esta compra por ser afiliado\n"
