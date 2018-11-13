@@ -16,16 +16,16 @@ op5:			.asciiz	"5. Cerrar programa\n"
 espacio:		.asciiz "\n"
 ingresoDeProductos:	.asciiz ">>>>>>>>> INGRESO DE PRODUCTOS <<<<<<<<<\n"
 ingreseNumeroProductos:	.asciiz "Ingrese el numero de productos de la compra: "
-str2:			.asciiz	"Cantidad no válida\n"
+str2:			.asciiz	"Cantidad no vÃ¡lida\n"
 strcalcularTotal:	.asciiz ">>>>>>>>> CALCULAR TOTAL <<<<<<<<<\n"
 
 
 .text
 _start:	
-	#Imprimir el menú
+	#Imprimir el menÃº
 	jal printMenu
 	
-	#input de la opción
+	#input de la opciÃ³n
 	li	$v0, 5
 	syscall
 	#guardar la opcion
@@ -56,24 +56,24 @@ _start:
 		addi $s7, $v0, 0
 		sw $s7, total_productos
 		
-		add $t0, $v0, $0 #que el número ingresado por pantalla se guarde en $t0
+		add $t0, $v0, $0 #que el nÃºmero ingresado por pantalla se guarde en $t0
 		li $v0, 4
 		la $a0, espacio
 		syscall
 		
-		#validaicón de cantidad de productos
+		#validaicÃ³n de cantidad de productos
 		while:
 			slti $t1, $t0, 1
 			beq $t1, $zero, noWhile
 			li $v0, 4
-			la $a0, str2 #printf("Cantidad no válida\n");
+			la $a0, str2 #printf("Cantidad no vÃ¡lida\n");
 			syscall
 			li $v0, 4
 			la $a0, espacio
 			syscall
 			li $v0, 5 #scanf ("%d", &total_productos);
 			syscall
-			add $t0, $v0, $0 #que el número ingresado por pantalla se guarde en $t0
+			add $t0, $v0, $0 #que el nÃºmero ingresado por pantalla se guarde en $t0
 			li $v0, 4
 			la $a0, espacio
 			syscall
@@ -120,7 +120,7 @@ _start:
 		addi $t0, $0, 0 #limpiar $t0
 	
 	.data
-		mensajeCierre:	.asciiz "¡Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n"
+		mensajeCierre:	.asciiz "Â¡Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n"
 	.text
 		li $v0, 4
 		la $a0, mensajeCierre 
@@ -129,7 +129,7 @@ _start:
 		syscall
 
 
-#Impresión de opciones
+#ImpresiÃ³n de opciones
 printMenu:
 	li	$v0, 4
 	la	$a0, mensajeInicial1
@@ -150,10 +150,10 @@ printMenu:
 
 	jr $ra
 	
-#Opción 1: Ingresar producto
+#OpciÃ³n 1: Ingresar producto
 ingresarProductoCarrito:
 	.data
-	str3:	.asciiz	"Producto Nº "
+	str3:	.asciiz	"Producto NÂº "
 	str4: 	.asciiz "Cantidad: "
 	str5:	.asciiz	"Precio: "
 	str6:	.asciiz	"Productos ingresados exitosamente \n"
@@ -172,7 +172,7 @@ ingresarProductoCarrito:
 	
 	
 	
-	#Obtener los arreglos para usarlos dentro de la función
+	#Obtener los arreglos para usarlos dentro de la funciÃ³n
 	la $s1, 0($a0) #cantidad
 	l.s $f4, ($a1) #precio
 	la $s3, 0($a2) #size
@@ -186,7 +186,7 @@ ingresarProductoCarrito:
 		li $t6, 0 #int ctd = 0;
 		
 		li $v0, 4
-		la $a0, str3 #Producto Nº 
+		la $a0, str3 #Producto NÂº 
 		syscall
 		li $v0, 1
 		move $a0, $t5
@@ -226,7 +226,7 @@ ingresarProductoCarrito:
 		j For
 		
 	finFor:
-		sw $s3, total_productos #guardar el tamaño del carrito, el cual la última vez que se puso fue en $s3
+		sw $s3, total_productos #guardar el tamaÃ±o del carrito, el cual la Ãºltima vez que se puso fue en $s3
 		#Restaurar registros
 		lw $t2, 0($sp)
 		lw $s2, 4($sp)
@@ -241,27 +241,29 @@ ingresarProductoCarrito:
 
 ####ELIMINAR ELEMENTO DEL CARRITO MEDIANTE INDICE
 #########################################################################################
-#	Funcion para eliminar productos de un carrito mediante su índice		#
-#	usa los punteros para encontrar el índice que se ingresó, 			#
-#	cambia la cantidad y el precio del producto a 0. Retorna el nuevo tamaño	#
+#	Funcion para eliminar productos de un carrito mediante su Ã­ndice		#
+#	usa los punteros para encontrar el Ã­ndice que se ingresÃ³, 			#
+#	cambia la cantidad y el precio del producto a 0. Retorna el nuevo tamaÃ±o	#
 #	del arreglo.									#
 #########################################################################################
 
 eliminarProducto: 
 		.data
 			print0: 	.asciiz ">>>>>>>>>>ELIMINAR PRODUCTO<<<<<<<<<<<<< \n"
+			print11: 	.asciiz "No hay productos en el carrito \n"
 			print1:		.asciiz "Ingrese el numero del producto que desea eliminar del carrito \n"
 			print21:	.asciiz "Recuerde que tiene "
 			print22:	.asciiz " producto(s) en su lista \n"
-			print3: 	.asciiz "Producto Nº "
+			print3: 	.asciiz "Producto NÂº "
 			print30: 	.asciiz "No se ha"
-			print31:	.asciiz " eliminado\n"
+			print31:	.asciiz " eliminado, volviendo al menÃº principal\n"
 
 		.text
 			#espacio en el stack
 			addi $sp, $sp, -4
 			sw $ra, 4($sp)
-			sw $a0, 0 ($sp)
+			
+			beqz $s7, zeroelem
 			#inicializacion de variables
 			
 			#int out_of_size = size +1
@@ -300,10 +302,6 @@ eliminarProducto:
 
 			#guardo el valor del user input en index
 			add $t1, $v0, $t1
-			
-			#guardo el valor 0 para comparacion posterior
-			addi $t5, $zero, 0
-			
 			#if index < out_of_size
 			blt $t1, $t0, delete
 		end:	
@@ -316,43 +314,77 @@ eliminarProducto:
 			la $a0, print31 #guardo direccion del string en $a0
 			syscall #imprimo el string
 			
+			lw $ra, 4($sp)
+			addi $sp, $sp, 4
 			jr $ra #retorno al main
+		zeroelem:
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print11 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			lw $ra, 4($sp)
+			addi $sp, $sp, 4
+			jr $ra #retorno al main	
+		
 		delete:
 			blt $t1, $0, end
 			beqz $t1, end
+			addi $t2, $t1, -1#int c=index -1
+			addi $t3, $s7, -1#size-1
+			la $a0, ($s6) #cargo la direccion de $s6 en $a0
+			move $t0, $zero
+		fordel: 
 			
-			addi $s7, $s7, -1
+			beq $t2, $t3, successdeletion
+			#for int c=index -1; c < size - 1; c++
+			sll $t4, $t2, 2 #$t4=$t2*4
+			add $t5, $a0, $t4 #$t5=$s6+$t4; &cantidad [c]
+			addi $t0, $t5, 4 #&cantidad [c+i]
+			lw $t7, ($t0) #cantidad [c+1]
+			sw $t7, ($t5) #cantidad [c] = cantidad [c+1]
+			sw $0, ($t0) #cantidad [c+1] = 0
+			
+			addi $t2,$t2,1
+			
+			
+			#cantidad [c] = cantidad [c+1]
+			#precio [c] = precio [c+1] 
+			
+		successdeletion:
+			addi $s7, $s7, -1 #size = size - 1
 			
 			li $v0, 4 #instruccion para imprimir string
 			la $a0, print3 #guardo direccion del string en $a0
 			syscall #imprimo el string
-			
-						
+					
 			li $v0, 1 #instruccion para imprimir int
 			la $a0, 0($t1) #guardo direccion del int
 			syscall #imprimo el int
 			
-			#printf ("\n");		
+			#printf
 			li $v0, 4 #instruccion para imprimir string
 			la $a0, print31 #guardo direccion del string en $a0
 			syscall #imprimo el string
 			
+			lw $ra, 4($sp)
+			addi $sp, $sp, 4
+			
 			jr $ra #retorno al main
 
 
-#Opción 3: Calcular Total
+#OpciÃ³n 3: Calcular Total
 calcularTotal:
 	.data
-		str1cal:	.asciiz	"¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
+		str1cal:	.asciiz	"Â¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
 		str2cal:	.asciiz	">>Usted ha presionado "
 		str3cal:	.asciiz	"-------------Detalle de la compra--------------\n"
-		str4cal:	.asciiz	"Producto Nº "
+		str4cal:	.asciiz	"Producto NÂº "
 		str5cal:	.asciiz	"	|Cantidad: "
 		str6cal:	.asciiz	" 	|Precio: $"
 		str7cal:	.asciiz	" 	|Precio Final: $"
 		str8cal:	.asciiz "Total: $"
 		str9cal:	.asciiz "Total con descuento: $"
-		str10cal:	.asciiz "Usted ahorró "
+		str10cal:	.asciiz "Usted ahorrÃ³ "
 		str11cal:	.asciiz " en esta compra por ser afiliado\n"
 		afi:		.space	4
 		opAfi:		.byte	'1'
@@ -377,7 +409,7 @@ calcularTotal:
 		la $s3, 0($a2) #size
 		
 		li $v0, 4
-		la $a0, str1cal #"¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
+		la $a0, str1cal #"Â¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
 		syscall
 		
 		li $v0, 8 #scanf (" %c", &afi);
@@ -429,11 +461,11 @@ calcularTotal:
 			#$f6 = precio_final
 			#$f7 = total
 			
-			#"Producto Nº "
+			#"Producto NÂº "
 			li $v0, 4
 			la $a0, str4cal
 			syscall
-			#número del producto
+			#nÃºmero del producto
 			li $v0, 1
 			addi $a0, $t2, 1
 			syscall
@@ -498,7 +530,7 @@ calcularTotal:
 		li $v0, 4
 		la $a0, espacio
 		syscall
-		la $a0, str10cal #"Usted ahorró "
+		la $a0, str10cal #"Usted ahorrÃ³ "
 		syscall
 		
 		li $v0, 3
