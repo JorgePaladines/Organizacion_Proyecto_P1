@@ -1,9 +1,9 @@
 .data
 cantidades_productos:	.word	0:100 #Arreglo de 100 ints
-precios_productos: 	.double	0.00:100 #Arreglo de 100 doubles con ceros
-DESCUENTO_AFI:		.double 0.95
-IVA:			.double	1.12
-total_precio:		.double	0.00
+precios_productos: 	.float	0.00:100 #Arreglo de 100 doubles con ceros
+DESCUENTO_AFI:		.float	0.95
+IVA:			.float	1.12
+total_precio:		.float	0.00
 total_productos:	.word	0
 
 mensajeInicial1:	.asciiz "******************BIENVENIDO AL SUPERMERCADO KOALA ELECTRONICO******************\n"
@@ -41,6 +41,8 @@ _start:
 	beq $t0, 5, OP5
 	
 	OP1:
+		addi $t0, $0, 0 #limpiar $t0
+		
 		li $v0, 4
 		la $a0, ingresoDeProductos
 		syscall
@@ -83,31 +85,40 @@ _start:
 			la $a1, precios_productos
 			addi $a2, $t0, 0
 			jal ingresarProductoCarrito
+			
 			jal _start
 
 	OP2:
+		addi $t0, $0, 0 #limpiar $t0
+	
 		la $s6, cantidades_productos #guardo la direccion del array en $s6
 		l.s $f20, precios_productos #guardo la direccion del array en $f20
 		lw $a0, total_productos #guardo size en $s7
 		jal eliminarProducto #llamo a la funcion de eliminacion
 		jal _start
 	OP3:
+		addi $t0, $0, 0 #limpiar $t0
+	
 		li $v0, 4
 		la $a0, strcalcularTotal
 		syscall
 		
 		la $a0, cantidades_productos
 		la $a1, precios_productos
-		sw $t0, total_productos
+		lw $t0, total_productos
 		addi $a2, $t0, 0
 		jal calcularTotal
 		s.s $f0, total_precio
 		jal _start
 	
 	OP4:
+		addi $t0, $0, 0 #limpiar $t0
+	
 	
 		jal _start
 	OP5:
+		addi $t0, $0, 0 #limpiar $t0
+	
 	.data
 		mensajeCierre:	.asciiz "¡Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n"
 	.text
@@ -151,7 +162,7 @@ ingresarProductoCarrito:
 	.text
 	#Guardar registros
 	addi $sp, $sp, -36
-	s.s $f0, 24($sp) #donde se guarda el input de cada precio
+	s.s $f4, 24($sp) #donde se guarda el input de cada precio
 	sw $t6, 20($sp) #ctd
 	sw $t5, 16($sp) #index
 	sw $s3, 12($sp) #total_productos
@@ -163,7 +174,7 @@ ingresarProductoCarrito:
 	
 	#Obtener los arreglos para usarlos dentro de la función
 	la $s1, 0($a0) #cantidad
-	la $s2, 0($a1) #precio
+	l.s $f4, ($a1) #precio
 	la $s3, 0($a2) #size
 	
 	
@@ -202,9 +213,9 @@ ingresarProductoCarrito:
 		add $t4, $t4, $s1 #cantiidad[i]
 		sw $t6, 0($t4) #cantidad[i] = ctd
 		
-		sll $t4, $t2, 3
+		sll $t4, $t2, 2
 		add $t4, $t4, $s2 #precio[i]
-		s.s $f0, 0($t4) #precio[i] = pr
+		s.s $f4, 0($t4) #precio[i] = pr
 		
 		addi $t2, $t2, 1 #i++
 		
@@ -215,6 +226,7 @@ ingresarProductoCarrito:
 		j For
 		
 	finFor:
+		sw $s3, total_productos #guardar el tamaño del carrito, el cual la última vez que se puso fue en $s3
 		#Restaurar registros
 		lw $t2, 0($sp)
 		lw $s2, 4($sp)
@@ -222,7 +234,7 @@ ingresarProductoCarrito:
 		lw $s3, 12($sp)
 		lw $t5, 16($sp) #index
 		lw $t6, 20($sp) #ctd
-		l.s $f0, 24($sp)
+		l.s $f4, 24($sp)
 		addi $sp, $sp, 36
 		jr $ra
 
@@ -345,9 +357,23 @@ calcularTotal:
 		afi:		.space	4
 		opAfi:		.byte	'1'
 	.text
+		#Guardar registros
+		addi $sp, $sp, -40
+		s.s $f9, 36($sp)
+		sw $s1, 32($sp)
+		s.s $f4, 28($sp)
+		sw $s3, 24($sp)
+		sw $t2, 20($sp)
+		s.s $f5, 16($sp)
+		s.s $f6, 12($sp)
+		s.s $f7, 8($sp)
+		s.s $f8, 4($sp)
+		s.s $f10, 0($sp)
+		
+		
 		
 		la $s1, 0($a0) #cantidad
-		l.s $f0, 0($a1) #precio
+		l.s $f4, precios_productos #precio
 		la $s3, 0($a2) #size
 		
 		li $v0, 4
@@ -377,30 +403,31 @@ calcularTotal:
 			beq $t1, $zero, calfinFor
 			
 			sll $t0, $t2, 2 # i * 4
-			sll $t1, $t2, 3 # i * 4
+			sll $t1, $t2, 2 # i * 4
 			
 			add $t0, $t0, $s1 #cantidad[i]	
 					
-			lw $t7, 0($s1)	
+			la $t7, ($s1)
 					
-			mtc1 $t7, $f11  #convertir cantidad[i] a un double
+			mtc1 $t7, $f11  #convertir cantidad[i] a un float
+			cvt.s.w $f11, $f11
 			
-			add.s $f4, $f4, $f0 #precio[i]
+			add.s $f5, $f5, $f4 #precio[i]
 			
 			#$f11 = cantidad[i], $f4 = precio[i], IVA = iva = 1.12
 			
-			mul.s $f6, $f11, $f4 #precio[i]*cantidad[i]
+			mul.s $f6, $f11, $f5 #precio[i]*cantidad[i]
 			
 			
 			
 			l.s $f8, IVA 
 			mul.s $f6, $f6, $f8 #precio[i]*cantidad[i]*IVA
-			add.s $f14, $f24, $f6 #total += precio_final;
+			add.s $f7, $f19, $f6 #total += precio_final;
 			
 			#$t0 = cantidad[i] como entero
-			#$f4 = precio[i]
+			#$f5 = precio[i]
 			#$f6 = precio_final
-			#$f14 = total
+			#$f7 = total
 			
 			#"Producto Nº "
 			li $v0, 4
@@ -424,7 +451,8 @@ calcularTotal:
 			syscall
 			#precio del producto
 			li $v0, 3
-			add.s $f12, $f4, $f24
+			add.s $f10, $f5, $f19
+			add.d $f12, $f10, $f16
 			syscall
 			#" 	|Precio Final: $"
 			li $v0, 4
@@ -432,7 +460,8 @@ calcularTotal:
 			syscall
 			#precio_final
 			li $v0, 3
-			add.s $f12, $f14, $f24
+			add.s $f10, $f7, $f19
+			add.d $f12, $f10, $f16
 			syscall
 			
 			li $v0, 4
@@ -447,7 +476,8 @@ calcularTotal:
 		la $a0, str8cal #"Total: $"
 		syscall
 		li $v0, 3
-		add.s $f12, $f14, $f24
+		add.s $f10, $f7, $f19
+		add.d $f12, $f10, $f16
 		syscall #printf("Total: $%lf\n", total);
 		li $v0, 4
 		la $a0, espacio
@@ -456,21 +486,24 @@ calcularTotal:
 		lb $s4, afi
 		lw $s5, opAfi
 		bne $s4, $s5, afiNoIgual1
-		l.s $f10, DESCUENTO_AFI
-		mul.s $f8, $f14, $f10 #$f8 = afi_total
+		l.s $f9, DESCUENTO_AFI
+		mul.s $f8, $f7, $f9 #$f8 = afi_total
 		li $v0, 4
 		la $a0, str9cal #"Total con descuento: $"
 		syscall
 		li $v0, 3
-		add.s $f12, $f10, $f24
+		add.s $f10, $f8, $f19
+		add.d $f12, $f10, $f16
 		syscall
 		li $v0, 4
 		la $a0, espacio
 		syscall
 		la $a0, str10cal #"Usted ahorró "
 		syscall
+		
 		li $v0, 3
-		sub.s $f12, $f14, $f8
+		sub.s $f10, $f7, $f8 #total - afi_total
+		add.d $f12, $f10, $f16
 		syscall
 		li $v0, 4
 		la $a0, str11cal #" en esta compra por ser afiliado\n"
@@ -481,5 +514,19 @@ calcularTotal:
 		#add.s $f0, $f14, $f24
 		#l.s $v0, $f0
 		
+		
+		
+		
+		l.s $f10, 0($sp)
+		l.s $f8, 4($sp)
+		l.s $f7, 8($sp)
+		l.s $f6, 12($sp)
+		l.s $f5, 16($sp)
+		lw $t2, 20($sp)
+		lw $s3, 24($sp)
+		l.s $f4, 28($sp)
+		lw $s1, 32($sp)
+		l.s $f9, 36($sp)
+		addi $sp, $sp, 40
 		
 		jr $ra
