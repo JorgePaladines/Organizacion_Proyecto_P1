@@ -16,13 +16,13 @@ op5:			.asciiz	"5. Cerrar programa\n"
 espacio:		.asciiz "\n"
 ingresoDeProductos:	.asciiz ">>>>>>>>> INGRESO DE PRODUCTOS <<<<<<<<<\n"
 ingreseNumeroProductos:	.asciiz "Ingrese el numero de productos de la compra: "
-str2:			.asciiz	"Cantidad no válida\n"
+str2:			.asciiz	"Cantidad no vï¿½lida\n"
 strcalcularTotal:	.asciiz ">>>>>>>>> CALCULAR TOTAL <<<<<<<<<\n"
 
 
 .text
 _start:	
-	#Imprimir el menú
+	#Imprimir el menï¿½
 	jal printMenu
 	
 	#input de la opciÃ³n
@@ -125,7 +125,7 @@ _start:
 		addi $t0, $0, 0 #limpiar $t0
 	
 	.data
-		mensajeCierre:	.asciiz "¡Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n"
+		mensajeCierre:	.asciiz "ï¿½Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n"
 	.text
 		li $v0, 4
 		la $a0, mensajeCierre 
@@ -134,7 +134,7 @@ _start:
 		syscall
 
 
-#Impresión de opciones
+#Impresiï¿½n de opciones
 printMenu:
 	li	$v0, 4
 	la	$a0, mensajeInicial1
@@ -155,10 +155,10 @@ printMenu:
 
 	jr $ra
 	
-#Opción 1: Ingresar producto
+#Opciï¿½n 1: Ingresar producto
 ingresarProductoCarrito:
 	.data
-	str3:	.asciiz	"Producto Nº "
+	str3:	.asciiz	"Producto Nï¿½ "
 	str4: 	.asciiz "Cantidad: "
 	str5:	.asciiz	"Precio: "
 	str6:	.asciiz	"Productos ingresados exitosamente \n"
@@ -177,7 +177,7 @@ ingresarProductoCarrito:
 	
 	
 	
-	#Obtener los arreglos para usarlos dentro de la función
+	#Obtener los arreglos para usarlos dentro de la funciï¿½n
 	la $s1, ($a0) #cantidad
 	la $s2, ($a1) #precio
 	la $s3, ($a2) #size
@@ -192,7 +192,7 @@ ingresarProductoCarrito:
 		li $t6, 0 #int ctd = 0;
 		
 		li $v0, 4
-		la $a0, str3 #Producto Nº 
+		la $a0, str3 #Producto Nï¿½ 
 		syscall
 		li $v0, 1
 		move $a0, $t5
@@ -232,7 +232,7 @@ ingresarProductoCarrito:
 		j For
 		
 	finFor:
-		sw $s3, total_productos #guardar el tamaño del carrito, el cual la última vez que se puso fue en $s3
+		sw $s3, total_productos #guardar el tamaï¿½o del carrito, el cual la ï¿½ltima vez que se puso fue en $s3
 		#Restaurar registros
 		lw $t2, 0($sp)
 		lw $s2, 4($sp)
@@ -260,9 +260,9 @@ eliminarProducto:
 			print1:		.asciiz "Ingrese el numero del producto que desea eliminar del carrito \n"
 			print21:	.asciiz "Recuerde que tiene "
 			print22:	.asciiz " producto(s) en su lista \n"
-			print3: 	.asciiz "Producto NÂº "
+			print3: 	.asciiz "Producto Nº "
 			print30: 	.asciiz "No se ha"
-			print31:	.asciiz " eliminado, volviendo al menÃº principal\n"
+			print31:	.asciiz " eliminado, volviendo al menú principal\n"
 
 		.text
 			#espacio en el stack
@@ -379,19 +379,19 @@ eliminarProducto:
 
 
 
-#Opción 3: Calcular Total
+#Opciï¿½n 3: Calcular Total
 calcularTotal:
 	.data
-		str1cal:	.asciiz	"¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
+		str1cal:	.asciiz	"ï¿½El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
 		str2cal:	.asciiz	">>Usted ha presionado "
 		str3cal:	.asciiz	"-------------Detalle de la compra--------------\n"
-		str4cal:	.asciiz	"Producto Nº "
+		str4cal:	.asciiz	"Producto Nï¿½ "
 		str5cal:	.asciiz	"	|Cantidad: "
 		str6cal:	.asciiz	" 	|Precio: $"
 		str7cal:	.asciiz	" 	|Precio Final: $"
 		str8cal:	.asciiz "Total: $"
 		str9cal:	.asciiz "Total con descuento: $"
-		str10cal:	.asciiz "Usted ahorró "
+		str10cal:	.asciiz "Usted ahorrï¿½ "
 		str11cal:	.asciiz " en esta compra por ser afiliado\n"
 		afi:		.space	4
 		opAfi:		.byte	'1'
@@ -417,7 +417,7 @@ calcularTotal:
 		la $t7, 0($a2) #size
 		
 		li $v0, 4
-		la $a0, str1cal #"¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
+		la $a0, str1cal #"ï¿½El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
 		syscall
 		
 		li $v0, 8 #scanf (" %c", &afi);
@@ -464,11 +464,11 @@ calcularTotal:
 			#$f6 = precio_final
 			#$f7 = total
 			
-			#"Producto Nº "
+			#"Producto Nï¿½ "
 			li $v0, 4
 			la $a0, str4cal
 			syscall
-			#número del producto
+			#nï¿½mero del producto
 			li $v0, 1
 			addi $a0, $t2, 1
 			syscall
@@ -515,10 +515,15 @@ calcularTotal:
 		la $a0, espacio
 		syscall
 		
-		lb $s4, afi
-		lw $s5, opAfi
-		bne $s4, $s5, afiNoIgual1
+		move $t4, $zero
+		move $t5, $zero
+		
+		lb $t4, afi
+		li $t5, 1
+		
+		bne $t4, $t5, afiNoIgual1
 		l.s $f9, DESCUENTO_AFI
+		
 		mul.s $f8, $f7, $f9 #$f8 = afi_total
 		li $v0, 4
 		la $a0, str9cal #"Total con descuento: $"
@@ -529,7 +534,7 @@ calcularTotal:
 		li $v0, 4
 		la $a0, espacio
 		syscall
-		la $a0, str10cal #"Usted ahorró "
+		la $a0, str10cal #"Usted ahorrï¿½ "
 		syscall
 		
 		li $v0, 2
@@ -543,9 +548,6 @@ calcularTotal:
 			#li $v0, 0
 			#add.s $f0, $f14, $f24
 			#l.s $v0, $f0
-		
-		
-		
 		
 		l.s $f10, 0($sp)
 		l.s $f8, 4($sp)
