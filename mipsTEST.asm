@@ -347,19 +347,19 @@ calcularTotal:
 		li $v0, 4
 		la $a0, espacio
 		syscall
-		la $a0, str10cal
+		la $a0, str10cal #"Usted ahorró "
 		syscall
 		li $v0, 3
 		sub.d $f12, $f14, $f8
 		syscall
 		li $v0, 4
-		la $a0, str11cal
+		la $a0, str11cal #" en esta compra por ser afiliado\n"
 		syscall
 		
 		afiNoIgual1:
-		li $v0, 0
-		add.d $f0, $f14, $f24
-		l.d $v0, $f0
+		#li $v0, 0
+		#add.d $f0, $f14, $f24
+		#l.d $v0, $f0
 		
 		
 		jr $ra
