@@ -92,12 +92,10 @@ _start:
 		addi $t0, $0, 0 #limpiar $t0
 	
 		la $s6, cantidades_productos #guardo la direccion del array en $s6
-		l.s $f20, precios_productos #guardo la direccion del array en $f20
+		la $s2, precios_productos #guardo la direccion del array en $f20
 		lw $s7, total_productos #guardo size en $s7
 		jal eliminarProducto #llamo a la funcion de eliminacion
 		sw $s7, total_productos
-		s.s $f20, precios_productos
-		
 		jal _start
 	OP3:
 		addi $t0, $0, 0 #limpiar $t0
@@ -263,9 +261,9 @@ eliminarProducto:
 			print1:		.asciiz "Ingrese el numero del producto que desea eliminar del carrito \n"
 			print21:	.asciiz "Recuerde que tiene "
 			print22:	.asciiz " producto(s) en su lista \n"
-			print3: 	.asciiz "Producto Nº "
+			print3: 	.asciiz "Producto Nï¿½ "
 			print30: 	.asciiz "No se ha"
-			print31:	.asciiz " eliminado, volviendo al menú principal\n"
+			print31:	.asciiz " eliminado, volviendo al menï¿½ principal\n"
 
 		.text
 			#espacio en el stack
@@ -341,9 +339,9 @@ eliminarProducto:
 			addi $t2, $t1, -1#int c=index -1
 			addi $t3, $s7, -1#size-1
 			la $a0, ($s6) #cargo la direccion de $s6 en $a0
+			la $t8, ($s2)  #cargo la direccion de $s2 en $t8
 			move $t0, $zero
 		fordel: 
-			
 			beq $t2, $t3, successdeletion
 			#for int c=index -1; c < size - 1; c++
 			sll $t4, $t2, 2 #$t4=$t2*4
@@ -351,11 +349,16 @@ eliminarProducto:
 			addi $t0, $t5, 4 #&cantidad [c+i]
 			lw $t7, ($t0) #cantidad [c+1]
 			sw $t7, ($t5) #cantidad [c] = cantidad [c+1]
-			sw $0, ($t0) #cantidad [c+1] = 0
-			
+			move $t0, $zero
+			#-----------------
+			add $t5, $t8, $t4
+			addi $t0, $t5, 4
+			l.s $f4, ($t0)
+			s.s $f4, ($t5)
+						
 			addi $t2,$t2,1
 			
-			
+			j fordel
 			#cantidad [c] = cantidad [c+1]
 			#precio [c] = precio [c+1] 
 			
