@@ -49,6 +49,10 @@ _start:
 		
 		li $v0, 5 #scanf ("%d", &total_productos);
 		syscall
+		#----------------------
+		lw $s7, total_productos
+		addi $s7, $v0, 0
+		sw $s7, total_productos
 		
 		add $t0, $v0, $0 #que el número ingresado por pantalla se guarde en $t0
 		li $v0, 4
@@ -79,9 +83,14 @@ _start:
 			la $a1, precios_productos
 			addi $a2, $t0, 0
 			jal ingresarProductoCarrito
+			jal _start
 
 	OP2:
-	
+		la $s6, cantidades_productos #guardo la direccion del array en $s6
+		l.s $f20, precios_productos #guardo la direccion del array en $f20
+		lw $a0, total_productos #guardo size en $s7
+		jal eliminarProducto #llamo a la funcion de eliminacion
+		jal _start
 	OP3:
 		li $v0, 4
 		la $a0, strcalcularTotal
@@ -92,11 +101,12 @@ _start:
 		sw $t0, total_productos
 		addi $a2, $t0, 0
 		jal calcularTotal
-		s.d $f0, total_precio
+		s.s $f0, total_precio
+		jal _start
 	
 	OP4:
 	
-	
+		jal _start
 	OP5:
 	.data
 		mensajeCierre:	.asciiz "¡Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n"
@@ -141,13 +151,14 @@ ingresarProductoCarrito:
 	.text
 	#Guardar registros
 	addi $sp, $sp, -36
-	s.d $f0, 24($sp) #donde se guarda el input de cada precio
+	s.s $f0, 24($sp) #donde se guarda el input de cada precio
 	sw $t6, 20($sp) #ctd
 	sw $t5, 16($sp) #index
 	sw $s3, 12($sp) #total_productos
 	sw $s1, 8($sp) #cantidades_productos
 	sw $s2, 4($sp) #precios_producto
 	sw $t2, 0($sp) #i del for
+	
 	
 	
 	#Obtener los arreglos para usarlos dentro de la función
@@ -169,6 +180,7 @@ ingresarProductoCarrito:
 		li $v0, 1
 		move $a0, $t5
 		syscall
+		
 		li $v0, 4
 		la $a0, espacio
 		syscall
@@ -192,7 +204,7 @@ ingresarProductoCarrito:
 		
 		sll $t4, $t2, 3
 		add $t4, $t4, $s2 #precio[i]
-		s.d $f0, 0($t4) #precio[i] = pr
+		s.s $f0, 0($t4) #precio[i] = pr
 		
 		addi $t2, $t2, 1 #i++
 		
@@ -210,9 +222,110 @@ ingresarProductoCarrito:
 		lw $s3, 12($sp)
 		lw $t5, 16($sp) #index
 		lw $t6, 20($sp) #ctd
-		l.d $f0, 24($sp)
+		l.s $f0, 24($sp)
 		addi $sp, $sp, 36
 		jr $ra
+
+
+####ELIMINAR ELEMENTO DEL CARRITO MEDIANTE INDICE
+#########################################################################################
+#	Funcion para eliminar productos de un carrito mediante su índice		#
+#	usa los punteros para encontrar el índice que se ingresó, 			#
+#	cambia la cantidad y el precio del producto a 0. Retorna el nuevo tamaño	#
+#	del arreglo.									#
+#########################################################################################
+
+eliminarProducto: 
+		.data
+			print0: 	.asciiz ">>>>>>>>>>ELIMINAR PRODUCTO<<<<<<<<<<<<< \n"
+			print1:		.asciiz "Ingrese el numero del producto que desea eliminar del carrito \n"
+			print21:	.asciiz "Recuerde que tiene "
+			print22:	.asciiz " producto(s) en su lista \n"
+			print3: 	.asciiz "Producto Nº "
+			print30: 	.asciiz "No se ha"
+			print31:	.asciiz " eliminado\n"
+
+		.text
+			#espacio en el stack
+			addi $sp, $sp, -4
+			sw $ra, 4($sp)
+			sw $a0, 0 ($sp)
+			#inicializacion de variables
+			
+			#int out_of_size = size +1
+			addi $t0, $s7, 1
+			#int index = $t1 = 0
+			addi $t1, $zero, 0
+			
+			
+			#printf (">>>>>>>>>>ELIMINAR PRODUCTO<<<<<<<<<<<<< \n");
+			
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print0 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			#printf ("Ingrese el numero del producto que desea eliminar del carrito \n");		
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print1 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			#printf("Recuerde que tiene %d productos en su lista \n", size);
+			
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print21 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			li $v0, 1 #instruccion para imprimir int
+			la $a0, 0($s7) #guardo direccion del int
+			syscall #imprimo el int
+			
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print22 #guardo direccion del int
+			syscall #imprimo el string
+			
+			li $v0, 5 #scanf ("%d", );
+			syscall
+
+			#guardo el valor del user input en index
+			add $t1, $v0, $t1
+			
+			#guardo el valor 0 para comparacion posterior
+			addi $t5, $zero, 0
+			
+			#if index < out_of_size
+			blt $t1, $t0, delete
+		end:	
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print30 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			#printf ("No se ha eliminado\n");		
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print31 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			jr $ra #retorno al main
+		delete:
+			blt $t1, $0, end
+			beqz $t1, end
+			
+			addi $s7, $s7, -1
+			
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print3 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+						
+			li $v0, 1 #instruccion para imprimir int
+			la $a0, 0($t1) #guardo direccion del int
+			syscall #imprimo el int
+			
+			#printf ("\n");		
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, print31 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			jr $ra #retorno al main
 
 
 #Opción 3: Calcular Total
@@ -234,7 +347,7 @@ calcularTotal:
 	.text
 		
 		la $s1, 0($a0) #cantidad
-		l.d $f0, 0($a1) #precio
+		l.s $f0, 0($a1) #precio
 		la $s3, 0($a2) #size
 		
 		li $v0, 4
@@ -265,17 +378,24 @@ calcularTotal:
 			
 			sll $t0, $t2, 2 # i * 4
 			sll $t1, $t2, 3 # i * 4
-			add $t0, $t0, $s1 #cantidad[i]
-			mtc1.d $t0, $f2
-  			cvt.d.w $f2, $f2 #convertir cantidad[i] a un double
-			add.d $f4, $f4, $f0 #precio[i]
 			
-			#$f2 = cantidad[i], $f4 = precio[i], IVA = iva = 1.12
+			add $t0, $t0, $s1 #cantidad[i]	
+					
+			lw $t7, 0($s1)	
+					
+			mtc1 $t7, $f11  #convertir cantidad[i] a un double
 			
-			mul.d $f6, $f2, $f4 #precio[i]*cantidad[i]
-			l.d $f8, IVA 
-			mul.d $f6, $f6, $f8 #precio[i]*cantidad[i]*IVA
-			add.d $f14, $f24, $f6 #total += precio_final;
+			add.s $f4, $f4, $f0 #precio[i]
+			
+			#$f11 = cantidad[i], $f4 = precio[i], IVA = iva = 1.12
+			
+			mul.s $f6, $f11, $f4 #precio[i]*cantidad[i]
+			
+			
+			
+			l.s $f8, IVA 
+			mul.s $f6, $f6, $f8 #precio[i]*cantidad[i]*IVA
+			add.s $f14, $f24, $f6 #total += precio_final;
 			
 			#$t0 = cantidad[i] como entero
 			#$f4 = precio[i]
@@ -304,7 +424,7 @@ calcularTotal:
 			syscall
 			#precio del producto
 			li $v0, 3
-			add.d $f12, $f4, $f24
+			add.s $f12, $f4, $f24
 			syscall
 			#" 	|Precio Final: $"
 			li $v0, 4
@@ -312,7 +432,7 @@ calcularTotal:
 			syscall
 			#precio_final
 			li $v0, 3
-			add.d $f12, $f14, $f24
+			add.s $f12, $f14, $f24
 			syscall
 			
 			li $v0, 4
@@ -327,7 +447,7 @@ calcularTotal:
 		la $a0, str8cal #"Total: $"
 		syscall
 		li $v0, 3
-		add.d $f12, $f14, $f24
+		add.s $f12, $f14, $f24
 		syscall #printf("Total: $%lf\n", total);
 		li $v0, 4
 		la $a0, espacio
@@ -336,13 +456,13 @@ calcularTotal:
 		lb $s4, afi
 		lw $s5, opAfi
 		bne $s4, $s5, afiNoIgual1
-		l.d $f10, DESCUENTO_AFI
-		mul.d $f8, $f14, $f10 #$f8 = afi_total
+		l.s $f10, DESCUENTO_AFI
+		mul.s $f8, $f14, $f10 #$f8 = afi_total
 		li $v0, 4
 		la $a0, str9cal #"Total con descuento: $"
 		syscall
 		li $v0, 3
-		add.d $f12, $f10, $f24
+		add.s $f12, $f10, $f24
 		syscall
 		li $v0, 4
 		la $a0, espacio
@@ -350,7 +470,7 @@ calcularTotal:
 		la $a0, str10cal #"Usted ahorró "
 		syscall
 		li $v0, 3
-		sub.d $f12, $f14, $f8
+		sub.s $f12, $f14, $f8
 		syscall
 		li $v0, 4
 		la $a0, str11cal #" en esta compra por ser afiliado\n"
@@ -358,8 +478,8 @@ calcularTotal:
 		
 		afiNoIgual1:
 		#li $v0, 0
-		#add.d $f0, $f14, $f24
-		#l.d $v0, $f0
+		#add.s $f0, $f14, $f24
+		#l.s $v0, $f0
 		
 		
 		jr $ra
