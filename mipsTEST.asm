@@ -98,12 +98,14 @@ _start:
 	
 	
 	OP5:
-	
-	
-
-	
-	li	$v0, 10
-	syscall
+	.data
+		mensajeCierre:	.asciiz "¡Hasta luego! Que tengas un bonito dia, fue un placer asistirte en tus compras.\n"
+	.text
+		li $v0, 4
+		la $a0, mensajeCierre 
+		syscall
+		li $v0, 10
+		syscall
 
 
 #Impresión de opciones
