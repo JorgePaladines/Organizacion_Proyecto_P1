@@ -397,11 +397,12 @@ calcularTotal:
 		opAfi:		.byte	'1'
 	.text
 		#Guardar registros
-		addi $sp, $sp, -40
+		addi $sp, $sp, -44
+		sw $t2, 40($sp)
 		s.s $f9, 36($sp)
-		sw $s1, 32($sp)
+		sw $t5, 32($sp)
 		s.s $f4, 28($sp)
-		sw $s3, 24($sp)
+		sw $t7, 24($sp)
 		sw $t2, 20($sp)
 		s.s $f5, 16($sp)
 		s.s $f6, 12($sp)
@@ -411,9 +412,9 @@ calcularTotal:
 		
 		
 		
-		la $s1, 0($a0) #cantidad
-		la $s2, 0($a1) #precio
-		la $s3, 0($a2) #size
+		la $t5, 0($a0) #cantidad
+		la $t6, 0($a1) #precio
+		la $t7, 0($a2) #size
 		
 		li $v0, 4
 		la $a0, str1cal #"¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
@@ -438,17 +439,17 @@ calcularTotal:
 		
 		li $t2, 0 #int i = 0
 		calFor:
-			slt $t1, $t2, $s3 # i < size
+			slt $t1, $t2, $t7 # i < size
 			beq $t1, $zero, calfinFor
 			
 			sll $t0, $t2, 2 # i * 4
 			sll $t1, $t2, 2 # i * 4
 			
-			add $t0, $t0, $s1 #cantidad[i]
+			add $t0, $t0, $t5 #cantidad[i]
 			lwc1 $f11, 0($t0)
 			cvt.s.w $f11, $f11
 			
-			add $t1, $t1, $s2 #precio[i]
+			add $t1, $t1, $t6 #precio[i]
 			lwc1 $f5, 0($t1) #leer el float
 			
 			l.s $f8, IVA 
@@ -539,9 +540,9 @@ calcularTotal:
 		syscall
 		
 		afiNoIgual1:
-		#li $v0, 0
-		#add.s $f0, $f14, $f24
-		#l.s $v0, $f0
+			#li $v0, 0
+			#add.s $f0, $f14, $f24
+			#l.s $v0, $f0
 		
 		
 		
@@ -556,7 +557,8 @@ calcularTotal:
 		l.s $f4, 28($sp)
 		lw $s1, 32($sp)
 		l.s $f9, 36($sp)
-		addi $sp, $sp, 40
+		lw $t2, 40($sp)
+		addi $sp, $sp, 44
 		
 		jr $ra
 
