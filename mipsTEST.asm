@@ -336,11 +336,30 @@ calcularTotal:
 		lb $s4, afi
 		lw $s5, opAfi
 		bne $s4, $s5, afiNoIgual1
-		
+		l.d $f10, DESCUENTO_AFI
+		mul.d $f8, $f14, $f10 #$f8 = afi_total
+		li $v0, 4
+		la $a0, str9cal #"Total con descuento: $"
+		syscall
+		li $v0, 3
+		add.d $f12, $f10, $f24
+		syscall
+		li $v0, 4
+		la $a0, espacio
+		syscall
+		la $a0, str10cal
+		syscall
+		li $v0, 3
+		sub.d $f12, $f14, $f8
+		syscall
+		li $v0, 4
+		la $a0, str11cal
+		syscall
 		
 		afiNoIgual1:
 		li $v0, 0
-		li $v1, 0
-		or $v0, $v0, $f14
-		lw $v0, $f15
+		add.d $f0, $f14, $f24
+		l.d $v0, $f0
+		
+		
 		jr $ra
