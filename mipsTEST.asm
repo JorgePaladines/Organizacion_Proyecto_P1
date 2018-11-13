@@ -249,7 +249,7 @@ calcularTotal:
 		li $v0, 4
 		la $a0, str2cal #">>Usted ha presionado "
 		syscall
-		lb $a0, afi
+		la $a0, afi
 		syscall
 		
 		li $v0, 4
@@ -259,9 +259,6 @@ calcularTotal:
 		syscall
 		
 		li $t2, 0 #int i = 0
-		li $v0, 4
-		la $a0, afi
-		syscall
 		calFor:
 			slt $t1, $t2, $s3 # i < size
 			beq $t1, $zero, calfinFor
@@ -336,17 +333,14 @@ calcularTotal:
 		la $a0, espacio
 		syscall
 		
-		lw $s4, afi
+		lb $s4, afi
 		lw $s5, opAfi
 		bne $s4, $s5, afiNoIgual1
 		
-		li $v0, 4
-		lb $a0, afi
-		syscall
-		la $a0, opAfi
-		syscall
 		
 		afiNoIgual1:
-			
-		
+		li $v0, 0
+		li $v1, 0
+		or $v0, $v0, $f14
+		lw $v0, $f15
 		jr $ra
