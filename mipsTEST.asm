@@ -10,22 +10,22 @@ mensajeInicial1:	.asciiz "******************BIENVENIDO AL SUPERMERCADO KOALA ELE
 mensajeInicial2:	.asciiz "Opciones: \n"
 op1:			.asciiz	"1. Ingresar producto al carrito de compras\n"
 op2:			.asciiz	"2. Eliminar producto del carrito de compras\n"
-op3:			.asciiz	"3. Calcular total y aplicar descuento por afiliacion\n"
+op3:			.asciiz	"3. Calcular total y aplicar descuento por afiliación\n"
 op4:			.asciiz	"4. Ingresar forma de pago & finalizar la compra actual\n"
 op5:			.asciiz	"5. Cerrar programa\n"
 espacio:		.asciiz "\n"
 ingresoDeProductos:	.asciiz ">>>>>>>>> INGRESO DE PRODUCTOS <<<<<<<<<\n"
 ingreseNumeroProductos:	.asciiz "Ingrese el numero de productos de la compra: "
-str2:			.asciiz	"Cantidad no vï¿½lida\n"
+str2:			.asciiz	"Cantidad no válida\n"
 strcalcularTotal:	.asciiz ">>>>>>>>> CALCULAR TOTAL <<<<<<<<<\n"
 
 
 .text
 _start:	
-	#Imprimir el menï¿½
+	#Imprimir el menú
 	jal printMenu
 	
-	#input de la opciÃ³n
+	#input de la opción
 	li	$v0, 5
 	syscall
 	#guardar la opcion
@@ -161,7 +161,7 @@ printMenu:
 #Opciï¿½n 1: Ingresar producto
 ingresarProductoCarrito:
 	.data
-	str3:	.asciiz	"Producto Nï¿½ "
+	str3:	.asciiz	"Producto N° "
 	str4: 	.asciiz "Cantidad: "
 	str5:	.asciiz	"Precio: "
 	str6:	.asciiz	"Productos ingresados exitosamente \n"
@@ -180,7 +180,7 @@ ingresarProductoCarrito:
 	
 	
 	
-	#Obtener los arreglos para usarlos dentro de la funciï¿½n
+	#Obtener los arreglos para usarlos dentro de la función
 	la $s1, ($a0) #cantidad
 	la $s2, ($a1) #precio
 	la $s3, ($a2) #size
@@ -263,9 +263,9 @@ eliminarProducto:
 			print1:		.asciiz "Ingrese el numero del producto que desea eliminar del carrito \n"
 			print21:	.asciiz "Recuerde que tiene "
 			print22:	.asciiz " producto(s) en su lista \n"
-			print3: 	.asciiz "Producto Nï¿½ "
+			print3: 	.asciiz "Producto N° "
 			print30: 	.asciiz "No se ha"
-			print31:	.asciiz " eliminado, volviendo al menï¿½ principal\n"
+			print31:	.asciiz " eliminado, volviendo al menú principal\n"
 
 		.text
 			#espacio en el stack
@@ -386,16 +386,16 @@ eliminarProducto:
 #Opciï¿½n 3: Calcular Total
 calcularTotal:
 	.data
-		str1cal:	.asciiz	"ï¿½El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n"
+		str1cal:	.asciiz	"¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Sí [Cualquier Tecla] No \n"
 		str2cal:	.asciiz	">>Usted ha presionado "
 		str3cal:	.asciiz	"-------------Detalle de la compra--------------\n"
-		str4cal:	.asciiz	"Producto Nï¿½ "
+		str4cal:	.asciiz	"Producto N° "
 		str5cal:	.asciiz	"	|Cantidad: "
 		str6cal:	.asciiz	" 	|Precio: $"
 		str7cal:	.asciiz	" 	|Precio Final: $"
 		str8cal:	.asciiz "Total: $"
 		str9cal:	.asciiz "Total con descuento: $"
-		str10cal:	.asciiz "Usted ahorrï¿½ "
+		str10cal:	.asciiz "Usted ahorró "
 		str11cal:	.asciiz " en esta compra por ser afiliado\n"
 		afi:		.space	4
 		opAfi:		.byte	'1'
