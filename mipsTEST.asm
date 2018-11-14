@@ -398,7 +398,7 @@ calcularTotal:
 	.text
 		#Guardar registros
 		addi $sp, $sp, -44
-		sw $t2, 40($sp)
+		sw $t6, 40($sp)
 		s.s $f9, 36($sp)
 		sw $t5, 32($sp)
 		s.s $f4, 28($sp)
@@ -438,6 +438,7 @@ calcularTotal:
 		syscall
 		
 		li $t2, 0 #int i = 0
+		add.s $f7, $f19, $f18 #total = 0.0
 		calFor:
 			slt $t1, $t2, $t7 # i < size
 			beq $t1, $zero, calfinFor
@@ -455,9 +456,10 @@ calcularTotal:
 			l.s $f8, IVA 
 			
 			#$f11 = cantidad[i], $f5 = precio[i], $f8 = IVA = 1.12
+			add.s $f6, $f18, $f19 #precio_final = 0
 			mul.s $f6, $f11, $f5 #precio[i]*cantidad[i]
 			mul.s $f6, $f6, $f8 #precio[i]*cantidad[i]*IVA
-			add.s $f7, $f19, $f6 #total += precio_final;
+			add.s $f7, $f7, $f6 #total += precio_final;
 			
 			#$t0 = cantidad[i] como entero
 			#$f5 = precio[i]
@@ -494,7 +496,7 @@ calcularTotal:
 			syscall
 			#precio_final
 			li $v0, 2
-			add.s $f12, $f7, $f19
+			add.s $f12, $f6, $f19
 			syscall
 			
 			li $v0, 4
@@ -544,10 +546,12 @@ calcularTotal:
 		la $a0, str11cal #" en esta compra por ser afiliado\n"
 		syscall
 		
+		#return (afi_total);
+		add.s $f0, $f7, $f19
+		
 		afiNoIgual1:
-			#li $v0, 0
-			#add.s $f0, $f14, $f24
-			#l.s $v0, $f0
+			#else return total;
+			add.s $f0, $f7, $f19
 		
 		l.s $f10, 0($sp)
 		l.s $f8, 4($sp)
@@ -555,11 +559,11 @@ calcularTotal:
 		l.s $f6, 12($sp)
 		l.s $f5, 16($sp)
 		lw $t2, 20($sp)
-		lw $s3, 24($sp)
+		lw $t7, 24($sp)
 		l.s $f4, 28($sp)
-		lw $s1, 32($sp)
+		lw $t5, 32($sp)
 		l.s $f9, 36($sp)
-		lw $t2, 40($sp)
+		lw $t6, 40($sp)
 		addi $sp, $sp, 44
 		
 		jr $ra
