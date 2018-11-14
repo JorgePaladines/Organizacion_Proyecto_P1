@@ -20,10 +20,15 @@ y despues ejecute el programa con `./super`
 
 Abra Mars 4.5 
 	> En linux, abra la consola y ejecute: 
+	
 		`java -jar Mars4_5.jar`
+		
 	> En windows:
+	
 		Haga doble clic en Mars4_5.jar
+		
 Haga clic en "Abrir" y seleccione el archivo _mipsTEST.asm_
+Ensamble el archivo y corralo en MARS
 
 		
 ### Opciones del programa:
@@ -43,19 +48,19 @@ Funcion para eliminar productos de un carrito mediante su índice, usa los punte
 Funcion para calcular el total y aplicar descuento por afiliacion, retorna el total a pagar
 Toma el puntero de los precios y calcula el total, con IVA
 Si es afiliado:
-	* Toma el total y le resta el DESCUENTO_AFI (descuento de afiliado)
-	* Retorna el total
+	a. Toma el total y le resta el descuento de afiliado (total multipicado por descuento; descuento < 1)
+	b. Retorna el total
 Si no es afiliado:
-	* Retorna el total
+	c. Retorna el total
 	
 	4. Efectuar pago & finalizar la compra actual
 
 Funcion para ingresar la forma de pago & finalizar la compra
 
 En efectivo:
-	* pide el ingreso de la cantidad con la que pago el cliente
-	*valida que la cantidad sea mayor al total
-	* calcula el cambio
+	a. pide el ingreso de la cantidad con la que pago el cliente
+	b. valida que la cantidad sea mayor al total
+	c. calcula el cambio
 
 	5. Cerrar programa
 
