@@ -73,21 +73,8 @@ int eliminarProductoCarrito(int size, int * cantidad, double * precio)
 	printf("Recuerde que tiene %d productos en su lista \n", size);
 
 	scanf ("%d", &index);
-	fflush( stdin );
 
-	if (index < 1 || index > out_of_size)
-	{
-		do{
-		
-			printf("Índice no válido\n Ingrese un numero mayor (o igual) que 1 y menor (o igual a) %d\n", size);
-			scanf ("%d", &index);
-			fflush( stdin );
-
-		}while (index < 1 || index > out_of_size);
-	} 
-
-
-	if ( index < out_of_size){
+	if ( index < out_of_size && index > 0){
 
 		for (int c = index - 1; c < size - 1; c++)
 		{
@@ -96,24 +83,13 @@ int eliminarProductoCarrito(int size, int * cantidad, double * precio)
 		}
 		printf("Producto Nº %d ha sido eliminado satisfactoriamente\n",index);
 
-		printf("Detalle del carrito actual: \n");
-		for (int d= 0; d< size - 1; d++)
-		{
-			printf("Producto Nº %d	|",d+1);
-			printf("Cantidad: %d, Precio: %lf\n",cantidad[d], precio[d]);
-
-		}
-
-		
-		printf("Total de productos: %d\n", size-1);
-
 		return size - 1;	
 			
 	}
 
 	else {
 
-		printf("No se ha ejecutado acción alguna.\n");
+		printf("No se ha eliminado el producto, volviendo al menú principal.\n");
 		return size;
 	}
 
@@ -136,32 +112,41 @@ double calcularTotal(int * cantidad,double * precio, int size)
 	char afi;
 	double total = 0.0;
 	
+	if (size > 0)
+	{
 	printf ("¿El cliente esta afiliado a SUPERMERCADOS KOALA? \n [1] Si [Cualquier Tecla] No \n");
 	scanf (" %c", &afi);
 	printf(">>Usted ha presionado %c\n",afi);
 	printf("-------------Detalle de la compra--------------\n");
 	
-	for(int i=0; i<size; i++)
-	{
-		double precio_final = precio[i]*cantidad[i]*IVA;
-		total+=precio_final;
-		printf("Producto Nº %d	|Cantidad: %d 	|Precio: $%lf 	|Precio Final: $%lf\n", i+1,cantidad[i],precio[i], precio_final);
-	}
-
-	printf("Total: $%lf\n", total);
-
-
-	if (afi =='1') 
-	{
-		double afi_total = total*DESCUENTO_AFI;
-		printf ("Total con descuento: $%lf\n", afi_total );
-		printf ("Usted ahorró %lf en esta compra por ser afiliado\n", total- afi_total);
-		return (afi_total);
-
-	}
-
-	else return total;
 	
+		for(int i=0; i<size; i++)
+		{
+			double precio_final = precio[i]*cantidad[i]*IVA;
+			total+=precio_final;
+			printf("Producto Nº %d	|Cantidad: %d 	|Precio: $%lf 	|Precio Final: $%lf\n", i+1,cantidad[i],precio[i], precio_final);
+		}
+
+		printf("Total: $%lf\n", total);
+
+
+		if (afi =='1') 
+		{
+			double afi_total = total*DESCUENTO_AFI;
+			printf ("Total con descuento: $%lf\n", afi_total );
+			printf ("Usted ahorró %lf en esta compra por ser afiliado\n", total- afi_total);
+			return (afi_total);
+
+		}
+
+		else return total;
+	}
+
+	else 
+	{
+		printf("No hay productos en el carrito \n");
+		return total;
+	}
 }
 
 
@@ -174,19 +159,32 @@ En efectivo:
 	* pide el ingreso de la cantidad con la que pago el cliente
 	*valida que la cantidad sea mayor al total
 	* calcula el cambio
-
+Retorna -1 si no se pudo procesar el pago
+	0 si la cantidad es insuficiente
+	1 el resto de casos
 */
 
 int finalizarCompra(double total)
 {
 	double fp;	
+	
+	if (total == 0)
+	{
+		printf ("No se ha podido procesar el pago, asegurese de que hayan elementos en el carrito\n");
+		return -1;
+	}
+
 	printf("Ingrese la cantidad a pagar en efectivo:\n");
 	scanf (" %lf", &fp);
-	if (fp<total){
+
+	if (fp<total)
+	{
 		printf("La cantidad ingresada es insuficiente para realizar la compra\n");
 		return 0;
 	}
-	else {	
+	
+	else 
+	{	
 	
 		printf ("Su cambio es de $%lf\n", fp-total);
 		return 1; 
@@ -195,7 +193,18 @@ int finalizarCompra(double total)
 
 }
 
+/*****************************************************
 
+ooo        ooooo       .o.       ooooo ooooo      ooo
+`88.       .888'      .888.      `888' `888b.     `8'
+ 888b     d'888      .8"888.      888   8 `88b.    8 
+ 8 Y88. .P  888     .8' `888.     888   8   `88b.  8 
+ 8  `888'   888    .88ooo8888.    888   8     `88b.8 
+ 8    Y     888   .8'     `888.   888   8       `888 
+o8o        o888o o88o     o8888o o888o o8o        `8 
+
+
+*****************************************************/
 
 
 
@@ -221,7 +230,6 @@ int main(void)
 				printf("Ingrese el numero de productos de la compra: ");
 
 				scanf ("%d", &total_productos);
-				fflush( stdin );
 
 				if (total_productos < 1)
 				{
@@ -229,7 +237,6 @@ int main(void)
 						
 						printf("Cantidad no válida\n");
 						scanf ("%d", &total_productos);
-						fflush( stdin );
 
 					}while (total_productos < 1);
 				} 
@@ -238,7 +245,6 @@ int main(void)
 				precios_productos = (double*)calloc(total_productos, sizeof(double));
 				
 				ingresarProductoCarrito(cantidades_productos, precios_productos, total_productos);
-				fflush( stdin );
 				break;
 
 
@@ -247,24 +253,25 @@ int main(void)
 				
 				printf(">>>>>>>>> ELIMINACION DE PRODUCTOS<<<<<<<<<\n");
 				total_productos = eliminarProductoCarrito(total_productos, cantidades_productos, precios_productos);
-				fflush( stdin );
-				
+
 				break;
 
 			case '3':
 
 				printf(">>>>>>>>> CALCULAR TOTAL <<<<<<<<<\n");
 				total_precio=calcularTotal(cantidades_productos, precios_productos,total_productos);
+				
 				break;
 
 			case '4':
 
 				printf(">>>>>>>>> EFECTUAR PAGO <<<<<<<<<\n");
-				if (finalizarCompra(total_precio)==1){
+				if (finalizarCompra(total_precio)==1)
+				{
 					free (cantidades_productos);
 					free (precios_productos);
 				}
-
+				
 				
 				break;
 
