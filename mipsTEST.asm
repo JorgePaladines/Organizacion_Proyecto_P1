@@ -399,7 +399,10 @@ calcularTotal:
 		str11cal:	.asciiz " en esta compra por ser afiliado\n"
 		afi:		.space	4
 		opAfi:		.byte	'1'
+		mensajeVacio:	.asciiz "No hay productos en el carrito\n"
 	.text
+		beqz $a2, vacio #si no hay productos en el carrito, ir al label vacio
+		
 		#Guardar registros
 		addi $sp, $sp, -44
 		sw $t6, 40($sp)
@@ -569,6 +572,12 @@ calcularTotal:
 		addi $sp, $sp, 44
 		
 		jr $ra
+		
+		vacio:
+			li $v0, 4
+			la $a0, mensajeVacio
+			syscall
+			jr $ra
 
 ####REALIZAR PAGO Y FINALIZAR COMPRA
 #########################################################################################
