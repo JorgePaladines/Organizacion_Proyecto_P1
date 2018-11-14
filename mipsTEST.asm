@@ -93,8 +93,11 @@ _start:
 	
 		la $s6, cantidades_productos #guardo la direccion del array en $s6
 		l.s $f20, precios_productos #guardo la direccion del array en $f20
-		lw $a0, total_productos #guardo size en $s7
+		lw $s7, total_productos #guardo size en $s7
 		jal eliminarProducto #llamo a la funcion de eliminacion
+		sw $s7, total_productos
+		s.s $f20, precios_productos
+		
 		jal _start
 	OP3:
 		addi $t0, $0, 0 #limpiar $t0
