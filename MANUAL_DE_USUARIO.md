@@ -4,10 +4,6 @@
 	Jorge Paladines
 	Daniela Montenegro
 ## Manual de uso
-	
-### Cómo compilar:
-
-Abra el terminal de linux con ctrl+alt+t
 
 #### Para usar el cajero de supermercado (en C):
  Compile con:
