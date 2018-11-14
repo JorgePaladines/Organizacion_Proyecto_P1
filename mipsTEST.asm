@@ -120,8 +120,9 @@ _start:
 	
 	OP4:
 		addi $t0, $0, 0 #limpiar $t0
-	
-	
+		l.s $f20, total_precio #$s5 = total_precio
+		jal finalizarCompra
+		s.s $f20, total_precio 
 		jal _start
 	OP5:
 		addi $t0, $0, 0 #limpiar $t0
@@ -351,17 +352,13 @@ eliminarProducto:
 			lw $t7, ($t0) #cantidad [c+1]
 			sw $t7, ($t5) #cantidad [c] = cantidad [c+1]
 			move $t0, $zero
-			#-----------------
+			#----------------- lo mismo que antes, solo que con precio
 			add $t5, $t8, $t4
 			addi $t0, $t5, 4
 			l.s $f4, ($t0)
 			s.s $f4, ($t5)
-						
 			addi $t2,$t2,1
-			
 			j fordel
-			#cantidad [c] = cantidad [c+1]
-			#precio [c] = precio [c+1] 
 			
 		successdeletion:
 			addi $s7, $s7, -1 #size = size - 1
@@ -573,9 +570,89 @@ calcularTotal:
 		
 		jr $ra
 
+####REALIZAR PAGO Y FINALIZAR COMPRA
+#########################################################################################
+#	Funcion para ingresar la forma de pago & finalizar la compra			#
+#											#
+#	En efectivo:									#
+#		* pide el ingreso de la cantidad con la que pago el cliente		#
+#		*valida que la cantidad sea mayor al total				#
+#		* calcula el cambio							#
+#########################################################################################
 
+finalizarCompra: 
+		.data
+			fc1: 	.asciiz ">>>>>>>>> EFECTUAR PAGO <<<<<<<<<\n"
+			fc11: 	.asciiz "No se ha podido procesar el pago, asegurese de que hayan elementos en el carrito\n"
+			fc12: 	.asciiz "La cantidad ingresada es insuficiente para realizar la compra\n"
+			fc20:	.asciiz "Ingrese la cantidad a pagar en efectivo:\n"
+			fc3: 	.asciiz "Su cambio es de $ "
+			fc31:	.asciiz "\n"
 
-
+		.text
+			#espacio en el stack
+			addi $sp, $sp, -4
+			sw $ra, 4($sp)
+			
+			
+			#printf (">>>>>>>>>>ELIMINAR PRODUCTO<<<<<<<<<<<<< \n");
+			
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, fc1 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			beqz $s5, zerototal #si el total=0, funcion sale por zero total
+			
+			#printf ("Ingrese la cantidad a pagar en efectivo:\n");		
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, fc20 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			l.s $f0, 6 #scanf ("%f", );
+			syscall
+			
+			mtc1 $0,$f17
+			#guardo el valor del user input en $f16
+			add.s $f16, $f0, $f17
+			c.lt.s  $f16, $f20 # pago < valor total
+			bc1f notenoughcash
+					
+			#printf ("Su cambio es de $ %f \n");		
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, fc3 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			li $v0, 2 #instruccion para imprimir int
+			sub.s $f12, $f20, $f16 
+			syscall #imprimo el int
+			
+			#printf ("Ingrese la cantidad a pagar en efectivo:\n");		
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, fc31 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			j endfc
+			
+	zerototal:
+					
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, fc11 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			j endfc
+	notenoughcash:
+			li $v0, 4 #instruccion para imprimir string
+			la $a0, fc12 #guardo direccion del string en $a0
+			syscall #imprimo el string
+			
+			j endfc
+			
+	endfc:
+		
+			lw $ra, 4($sp)
+			addi $sp, $sp, 4
+			
+			jr $ra #retorno al main
 
 
 
