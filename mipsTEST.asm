@@ -517,11 +517,9 @@ calcularTotal:
 		la $a0, espacio
 		syscall
 		
-		move $t4, $zero
-		move $t5, $zero
 		
 		lb $t4, afi
-		li $t5, 1
+		lb $t5, opAfi
 		
 		bne $t4, $t5, afiNoIgual1
 		l.s $f9, DESCUENTO_AFI
